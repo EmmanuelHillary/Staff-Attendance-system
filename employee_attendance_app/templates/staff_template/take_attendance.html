@@ -1,0 +1,59 @@
+{% extends 'staff_template/base_template.html' %}
+{% load static %}
+{% load check_attendance %}
+{% block page_header %}Check Attendance{% endblock page_header %}
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">Check Attendance</h3>
+  
+                  <div class="card-tools">
+                    <div class="input-group input-group-sm" style="width: 150px;">
+                      <input type="text" name="table_search" class="form-control float-right" placeholder="Search">
+  
+                      <div class="input-group-append">
+                        <button type="submit" class="btn btn-default"><i class="fas fa-search"></i></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body table-responsive p-0">
+                  <table class="table table-hover text-nowrap">
+                    <thead>
+                      <tr>
+                        <th>Attendance Date</th>
+                        <th>Session</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for attendance in attendances %}
+                      <tr>
+                        <td>{{ attendance.attendance_date|date:"d M, Y" }}</td>
+                        <td>{{ attendance.session_year_id.session_start_year }} - TO - {{ attendance.session_year_id.session_end_year }}</td>
+                          {% check_status attendance.attendance_date request.user.username as status %}
+                          {% if status %}
+                            <td><span style="color: green">Present</span></td>
+                          {% else %}
+                            <td><span style="color: red;">Absent</span></td>
+                          {% endif %}
+                        
+                      </tr>
+                        {% endfor %}
+                    </tbody>
+                  </table>
+
+                </div>
+                <!-- /.card-body -->
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+    </div><!-- /.container-fluid -->
+</section>
+{% endblock main_content %}

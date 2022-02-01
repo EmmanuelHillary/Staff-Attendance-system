@@ -1,0 +1,233 @@
+{% extends 'manager_template/base_template.html' %}
+{% load static %}
+{% block page_header %}Home{% endblock page_header %}
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-3 col-6">
+              <!-- small box -->
+              <div class="small-box bg-info">
+                <div class="inner">
+                  <h3>{{total_staffs}}</h3>
+  
+                  <p>Total Staffs</p>
+                </div>
+                <div class="icon">
+                  <i class="ion-stats-bars"></i>
+                </div>
+              </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-3 col-6">
+              <!-- small box -->
+              <div class="small-box bg-success">
+                <div class="inner">
+                  <h3>{{total_present_attendances}}</h3>
+  
+                  <p>Total Present Attendances</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-stats-bars"></i>
+                </div>
+              </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-3 col-6">
+              <!-- small box -->
+              <div class="small-box bg-warning">
+                <div class="inner">
+                  <h3>{{total_attendances}}</h3>
+  
+                  <p>Total Attendances</p>
+                </div>
+                <div class="icon">
+                  <i class="ion-stats-bars"></i>
+                </div>
+              </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-3 col-6">
+              <!-- small box -->
+              <div class="small-box bg-danger">
+                <div class="inner">
+                  <h3>{{total_absent_attendances}}</h3>
+  
+                  <p>Total Absent Attendances</p>
+                </div>
+                <div class="icon">
+                  <i class="ion-stats-bars"></i>
+                </div>
+              </div>
+            </div>
+            <!-- ./col -->
+          </div>
+          <div class="row">
+            <div class="col-12">
+                <!-- PIE CHART -->
+            <div class="card card-danger">
+                <div class="card-header">
+                  <h3 class="card-title">Staff Attendance Chart</h3>
+  
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <canvas id="pieChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+                <!-- /.card-body -->
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+          <!-- /.card-header -->
+          <div class="card-header">
+            <div class="card-body">
+            <form id="form">
+              <div class="form-group">
+                <label>Attendance Record</label>
+                <input type="date" id="date" class="form-control" name="attendance_date" placeholder="Enter Session Start Year">
+              </div>
+              <div class="form-group">
+                <input type="submit" value="Filter" class="btn btn-primary">
+              </div>
+            </form>
+
+            </div>
+          </div>
+          <div class="card-body table-responsive p-0">
+            <table class="table table-hover text-nowrap">
+              <thead>
+                <tr>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="table_body">
+                <tr>
+                  <td><h4>No Data</h4></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+            
+
+          </div>
+          <!-- /.card-body -->
+    </div>
+</section>
+{% endblock main_content %}
+
+{% block custom_js %}
+<script>
+    $(document).ready(function(){
+        var pieData  = {
+            labels: [
+                'TOTAL ABSENT', 
+                'TOTAL PRESENT',
+                'TOTAL ATTENDANCE'
+            ],
+            datasets: [
+                {
+                data: [{{ total_absent_attendances }}, {{ total_present_attendances }}, {{ total_attendances }}],
+                backgroundColor : ['#f56954', '#00a65a', '#f39c12'],
+                }
+            ]
+        }
+    var pieChartCanvas = $('#pieChart').get(0).getContext('2d')
+    var pieOptions     = {
+      maintainAspectRatio : false,
+      responsive : true,
+    }
+    var pieChart = new Chart(pieChartCanvas, {
+      type: 'pie',
+      data: pieData,
+      options: pieOptions      
+    })
+    })
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+  const csrftoken = getCookie('csrftoken');
+    $('#form').submit(function(e){
+      e.preventDefault()
+      let date = $('#date').val()
+      if (date === ""){
+        alert("Invalid Date")
+      }
+      else{
+        let data = {date}
+        let url = `{% url 'attendance_filter' %}`
+        $.ajax({
+                method: "POST",
+                url: url,
+                headers:{"X-CSRFToken": csrftoken},
+                data: JSON.stringify(data),
+                dataType: "json",
+                contentType: "application/json",
+                success: function (data, textStatus, xhr) {
+                          if (xhr.status === 200){
+                            console.log(data)
+                            if(data.data.length > 0){
+                              let table_body = '';
+                              for (let i = 0; i < data.data.length; i++){
+                                if(data.data[i].attendance){
+                                  table_body += `
+                                      <tr>
+                                        <td>${data.data[i].staff_first_name}</td>
+                                        <td>${data.data[i].staff_last_name}</td>
+                                        <td style="color: green;">Present</td>
+                                      </tr>
+                                      `
+                                }
+                                else{
+                                  table_body += `
+                                      <tr>
+                                        <td>${data.data[i].staff_first_name}</td>
+                                        <td>${data.data[i].staff_last_name}</td>
+                                        <td style="color: red;">Absent</td>
+                                      </tr>
+                                      `
+                                }
+                                
+                              }
+                              $('#table_body').html(table_body)
+                            }
+                            else{
+                              $('#table_body').html(
+                                `
+                                <tr>
+                                  <td><h4>No Data</h4></td>
+                                  <td></td>
+                                  <td></td>
+                                </tr>
+                                `
+                              )
+                            }
+                        }
+                  },
+                error: function (data, textStatus, xhr) {
+                  console.log(data)
+                  }
+              });
+      }
+
+    })
+</script>
+{% endblock custom_js %}

@@ -1,0 +1,85 @@
+{% load static %}
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Sidebar user panel (optional) -->
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="info">
+          <a href="#" class="d-block">{{ user.username }}</a>
+        </div>
+      </div>
+
+      <!-- Sidebar Menu -->
+      <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+          <!-- Add icons to the links using the .nav-icon class
+               with font-awesome or any other icon font library -->
+            <li class="nav-item">
+            {% url 'manager' as  manager %}
+            <a href="{{ manager }}" class="nav-link {% if request.path == manager %}active{% endif %}" >
+              <i class="nav-icon fas fa-th"></i>
+              <p>
+                Home
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            {% url 'manage_staff' as  manage_staff %}
+            <a href="{{ manage_staff }}" class="nav-link {% if request.path == manage_staff %}active{% endif %}">
+              <i class="nav-icon fas fa-th"></i>
+              <p>
+                Manage Staff
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            {% url 'manage_session' as  manage_session %}
+            <a href="{{ manage_session }}" class="nav-link {% if request.path == manage_session %}active{% endif %}">
+              <i class="nav-icon fas fa-th"></i>
+              <p>
+                Manage Session
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            {% url 'manage_attendance' as  manage_attendance %}
+            <a href="{{ manage_attendance }}" class="nav-link {% if request.path == manage_attendance %}active{% endif %}">
+              <i class="nav-icon fas fa-th"></i>
+              <p>
+                Manage Attendance
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            {% url 'attendance_record' as  attendance_record %}
+            <a href="{{ attendance_record }}" class="nav-link {% if request.path == attendance_record %}active{% endif %}">
+              <i class="nav-icon fas fa-th"></i>
+              <p>
+                Attendance Record
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            {% url 'add_location' as  add_location %}
+            <a href="{{ add_location }}" class="nav-link {% if request.path == add_location %}active{% endif %}">
+              <i class="nav-icon fas fa-th"></i>
+              <p>
+                Add Location
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
+            {% url 'manage_location' as  manage_location %}
+            <a href="{{ manage_location }}" class="nav-link {% if request.path == manage_location %}active{% endif %}">
+              <i class="nav-icon fas fa-th"></i>
+              <p>
+                Manage Location
+              </p>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+  </aside>

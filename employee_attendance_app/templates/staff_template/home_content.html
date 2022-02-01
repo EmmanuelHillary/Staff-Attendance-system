@@ -1,0 +1,141 @@
+{% extends 'staff_template/base_template.html' %}
+{% load static %}
+{% block page_header %}Home{% endblock page_header %}
+{% block main_content %}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-4 col-6">
+              <!-- small box -->
+              <div class="small-box bg-info">
+                <div class="inner">
+                  <h3>{{ total_attendance }}</h3>
+  
+                  <p>Total Attendance</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-stats-bars"></i>
+                </div>
+                <a href="{% url 'take_attendance' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-4 col-6">
+              <!-- small box -->
+              <div class="small-box bg-success">
+                <div class="inner">
+                  <h3>{{ absent_attendance }}</h3>
+  
+                  <p>Absent</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-stats-bars"></i>
+                </div>
+                <a href="{% url 'take_attendance' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-4 col-6">
+              <!-- small box -->
+              <div class="small-box bg-warning">
+                <div class="inner">
+                  <h3>{{ present_attendance }}</h3>
+  
+                  <p>Present</p>
+                </div>
+                <div class="icon">
+                  <i class="ion ion-stats-bars"></i>
+                </div>
+                <a href="{% url 'take_attendance' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-4">
+                {% for message in messages %}
+                    <div class="alert {{ message.tags }} alert-dismissible mb-3" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                <div class="card card-secondary">
+                    <div class="card-header">
+                      <h3 class="card-title">Attendance For: {{ date|date:"D d M, Y" }}</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                      <form role="form" method="post" action="{% url 'mark_attendance' %}">
+                          {% csrf_token %}
+                        <div class="form-group">
+                          <div class="custom-control custom-switch custom-switch-off-danger custom-switch-on-success">
+                              {% if check_attendance %} 
+                            <input type="checkbox" class="custom-control-input" id="customSwitch3" onchange="submitFunc()" checked>
+                            {% else %}
+                            <input type="checkbox" class="custom-control-input" id="customSwitch3" onchange="submitFunc()">
+                            {% endif %}
+                            <label class="custom-control-label" for="customSwitch3">Mark Attendance</label>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    <!-- /.card-body -->
+                  </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+                <!-- PIE CHART -->
+            <div class="card card-danger">
+                <div class="card-header">
+                  <h3 class="card-title">Attendance Chart</h3>
+  
+                  <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <canvas id="pieChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                </div>
+                <!-- /.card-body -->
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+    </div><!-- /.container-fluid -->
+</section>
+{% endblock main_content %}
+
+{% block custom_js %}
+<script>
+    $(document).ready(function(){
+        var pieData  = {
+            labels: [
+                'ABSENT', 
+                'PRESENT',
+            ],
+            datasets: [
+                {
+                data: [{{ absent_attendance }}, {{ present_attendance }}],
+                backgroundColor : ['#f56954', '#00a65a'],
+                }
+            ]
+        }
+    var pieChartCanvas = $('#pieChart').get(0).getContext('2d')
+    var pieOptions     = {
+      maintainAspectRatio : false,
+      responsive : true,
+    }
+    var pieChart = new Chart(pieChartCanvas, {
+      type: 'pie',
+      data: pieData,
+      options: pieOptions      
+    })
+    })
+    function submitFunc(){
+        $('form').submit()
+    }
+</script>
+{% endblock custom_js %}
